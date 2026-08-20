@@ -133,7 +133,7 @@ export default function Home() {
         </div>
         <div className="page-panel plans-panel" aria-hidden={activeView !== "plans"}><PlansView /></div>
         </div></div>
-        <nav className="bottom-nav" aria-label="画面ナビゲーション"><button className={`nav-link ${activeView === "chat" ? "selected" : ""}`} type="button" onClick={() => setActiveView("chat")}>{activeView === "chat" && <span className="selected-indicator" />}<Icon name={activeView === "chat" ? instantMode ? "ontime-chat" : "chat" : "chat-black"} size={24} /><span>チャット</span></button><button className={`nav-link ${activeView === "plans" ? "selected" : ""}`} type="button" onClick={() => setActiveView("plans")}><Icon name={activeView === "plans" ? "plan-blue" : "plan"} size={24} /><span>プラン</span>{activeView === "plans" && <span className="selected-indicator bottom" />}</button></nav>
+        <nav className="bottom-nav" aria-label="画面ナビゲーション"><button className={`nav-link ${activeView === "chat" ? "selected" : ""}`} type="button" onClick={() => setActiveView("chat")}>{activeView === "chat" && <span className="selected-indicator" />}<Icon name={activeView === "chat" ? instantMode ? "ontime-chat" : "chat" : "chat-black"} size={24} /><span>チャット</span></button><button className={`nav-link ${activeView === "plans" ? "selected" : ""}`} type="button" onClick={() => setActiveView("plans")}>{activeView === "plans" && <span className="selected-indicator" />}<Icon name={activeView === "plans" ? "plan-blue" : "plan"} size={24} /><span>プラン</span></button></nav>
       </section>
     </main>
   );
