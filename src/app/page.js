@@ -61,6 +61,7 @@ export default function Home() {
   const [selectedTags, setSelectedTags] = useState([]);
   const [submittedTags, setSubmittedTags] = useState([]);
   const [chatMode, setChatMode] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [dragX, setDragX] = useState(0);
   const [isSwiping, setIsSwiping] = useState(false);
   const swipeStart = useRef(null);
@@ -68,7 +69,12 @@ export default function Home() {
   const toggleTag = (tag) => setSelectedTags((current) => current.some((item) => item.label === tag.label) ? current.filter((item) => item.label !== tag.label) : [...current, tag]);
   const isSelected = (label) => selectedTags.some((item) => item.label === label);
   const changeMode = (enabled) => { setInstantMode(enabled); setSelectedTags([]); };
-  const submitRequest = () => { if (!selectedTags.length || chatMode) return; setSubmittedTags([...selectedTags]); setChatMode(true); };
+  const submitRequest = () => {
+    if (!selectedTags.length || chatMode || isSubmitting) return;
+    setSubmittedTags([...selectedTags]);
+    setIsSubmitting(true);
+    window.setTimeout(() => { setChatMode(true); setIsSubmitting(false); }, 320);
+  };
   const proposalText = `${submittedTags.map((item) => item.label).join("、")}を基に旅先を提案します。`;
   const startSwipe = (event) => {
     if (event.target.closest("[data-no-page-swipe]")) return;
@@ -103,11 +109,11 @@ export default function Home() {
         <div className="page-swipe-viewport" onTouchStart={startSwipe} onTouchMove={moveSwipe} onTouchEnd={endSwipe} onTouchCancel={endSwipe}>
         <div className={`page-swipe-track ${isSwiping ? "is-swiping" : ""}`} style={{ transform:`translateX(calc(${activeView === "plans" ? -50 : 0}% + ${dragX}px))` }}>
         <div className="page-panel chat-panel" aria-hidden={activeView !== "chat"}>
-        {chatMode ? <section className="conversation" aria-live="polite">
+        {chatMode ? <section className="conversation conversation-enter" aria-live="polite">
           <article className="message message-user"><strong>あなた</strong><div className="message-tags">{submittedTags.map((item) => <InputTag {...item} disabled key={item.label} />)}</div></article>
           <article className="message message-ai"><strong>IB Navigator</strong><p>もちろんです。{proposalText}</p><small>AIが提案を作成中です</small></article>
           <p className="ai-disclaimer">AIの提案には誤りが含まれる場合があります。予約前に最新情報をご確認ください。</p>
-        </section> : <>
+        </section> : <div className={`planning-content ${isSubmitting ? "is-leaving" : ""}`}>
         <section className="greeting"><h1>こんばんは、佐藤さん</h1>{instantMode ? <p>直ぐにアドレスを提案できます</p> : <p>どんなお出かけを一緒に計画しましょうか？<br />希望を伝えるだけで候補を整理します。</p>}</section>
         <div className="top-gap" />
         <button className={`advice-card ${showAdvice ? "is-open" : ""}`} type="button" onClick={() => setShowAdvice((open) => !open)} aria-expanded={showAdvice} aria-controls="discover-content">
@@ -127,9 +133,9 @@ export default function Home() {
           <div className="pinned-heading"><Icon name="pin" /><span>クリップしたタッグ</span></div>
           <div className="pinned-grid">{pinnedItems.map((item) => <Tag {...item} selected={isSelected(item.label)} onToggle={item.label === "追加" ? undefined : toggleTag} key={item.label} />)}</div>
         </div>
-        </>}
+        </div>}
 
-        <section className="composer"><div className="drop-zone"><div className="composer-copy">{selectedTags.length ? <div className="composer-selection" data-no-page-swipe aria-label="選択したタグ" tabIndex={0} onWheel={(event) => { if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) event.currentTarget.scrollLeft += event.deltaY; }}>{selectedTags.map((item) => <InputTag {...item} disabled={chatMode} onRemove={() => toggleTag(item)} key={item.label} />)}</div> : <p>タグやスポットを追加または長押で音声認識</p>}<label className="instant-mode"><input type="checkbox" checked={instantMode} disabled={chatMode} onChange={(event) => changeMode(event.target.checked)} /><span className="toggle" aria-hidden="true"><span /></span><span>即時検索モード</span></label></div><button className="send-button" type="button" disabled={!selectedTags.length || chatMode} onClick={submitRequest} aria-label="旅行条件を送信"><Icon name="arrow-right" size={16} /></button></div></section>
+        <section className="composer"><div className="drop-zone"><div className="composer-copy">{selectedTags.length ? <div className="composer-selection" data-no-page-swipe aria-label="選択したタグ" tabIndex={0} onWheel={(event) => { if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) event.currentTarget.scrollLeft += event.deltaY; }}>{selectedTags.map((item) => <InputTag {...item} disabled={chatMode || isSubmitting} onRemove={() => toggleTag(item)} key={item.label} />)}</div> : <p>タグやスポットを追加または長押で音声認識</p>}<label className="instant-mode"><input type="checkbox" checked={instantMode} disabled={chatMode || isSubmitting} onChange={(event) => changeMode(event.target.checked)} /><span className="toggle" aria-hidden="true"><span /></span><span>即時検索モード</span></label></div><button className="send-button" type="button" disabled={!selectedTags.length || chatMode || isSubmitting} onClick={submitRequest} aria-label="旅行条件を送信"><Icon name="arrow-right" size={16} /></button></div></section>
         </div>
         <div className="page-panel plans-panel" aria-hidden={activeView !== "plans"}><PlansView /></div>
         </div></div>

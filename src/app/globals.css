@@ -18,6 +18,8 @@ button,input { font:inherit; } button,a { -webkit-tap-highlight-color:transparen
 .page-swipe-track { display:flex; width:200%; height:100%; will-change:transform; transition:transform 320ms cubic-bezier(.2,0,0,1); }
 .page-swipe-track.is-swiping { transition:none; }
 .page-panel { display:flex; width:50%; min-width:0; height:100%; flex:0 0 50%; flex-direction:column; overflow:hidden; }
+.planning-content { display:flex; min-height:0; flex:1 1 0; flex-direction:column; }
+.planning-content.is-leaving { pointer-events:none; animation:planning-leave 320ms ease-out both; }
 .greeting { display:flex; min-height:96px; flex:0 0 96px; flex-direction:column; gap:4px; align-items:flex-start; padding:14px 16px; overflow:hidden; background:var(--accent); color:#fff; transition:background-color 280ms ease-in-out; }
 .greeting h1 { width:100%; margin:0; font-size:20px; font-weight:600; line-height:24px; }
 .greeting p { width:100%; margin:0; font-size:14px; line-height:20px; }
@@ -52,6 +54,10 @@ button,input { font:inherit; } button,a { -webkit-tap-highlight-color:transparen
 .input-tag span { overflow:hidden; text-overflow:ellipsis; }
 .input-tag:disabled { opacity:1; cursor:default; }
 .conversation { display:flex; min-height:0; flex:1 1 0; flex-direction:column; gap:16px; padding:16px; overflow-y:auto; background:#fff; }
+.conversation-enter>.message,.conversation-enter>.ai-disclaimer { animation:conversation-section-enter 420ms cubic-bezier(.2,0,0,1) both; }
+.conversation-enter>.message-user { animation-delay:60ms; }
+.conversation-enter>.message-ai { animation-delay:220ms; }
+.conversation-enter>.ai-disclaimer { animation-delay:380ms; }
 .plans-view { display:flex; min-height:0; flex:1 1 0; flex-direction:column; padding:0 16px; background:#fff; }
 .plans-controls { display:flex; height:184px; flex:0 0 184px; flex-direction:column; justify-content:center; gap:16px; }
 .plans-title-row { display:flex; height:32px; align-items:center; gap:8px; }
@@ -102,5 +108,7 @@ button,input { font:inherit; } button,a { -webkit-tap-highlight-color:transparen
 .nav-link.selected { color:var(--accent); font-weight:600; transition:color 280ms ease-in-out; }
 .selected-indicator { width:32px; height:2px; flex:0 0 2px; background:var(--accent); transition:background-color 280ms ease-in-out; }
 .nav-link:not(.selected) { padding-top:6px; }
+@keyframes planning-leave { from { opacity:1; } to { opacity:0; } }
+@keyframes conversation-section-enter { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:translateY(0); } }
 @media (min-width:391px) { .app-frame { box-shadow:0 0 0 1px #e0e0e0,0 12px 36px rgba(0,0,0,.08); } }
-@media (prefers-reduced-motion:reduce) { .page-swipe-track,.discover-scroll,.greeting,.advice-card,.drop-zone,.toggle,.send-button,.nav-link.selected,.selected-indicator { transition:none; } }
+@media (prefers-reduced-motion:reduce) { .planning-content.is-leaving,.conversation-enter>.message,.conversation-enter>.ai-disclaimer { animation-duration:1ms; animation-delay:0ms; } .page-swipe-track,.discover-scroll,.greeting,.advice-card,.drop-zone,.toggle,.send-button,.nav-link.selected,.selected-indicator { transition:none; } }
