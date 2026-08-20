@@ -3,7 +3,7 @@
 :root { --blue:#0f62fe; --text:#181818; --text-secondary:#525252; --border:#dfdfdf; --composer-bg:#f5f9ff; }
 * { box-sizing:border-box; }
 html,body { min-height:100%; }
-body { margin:0; background:#f4f4f4; color:var(--text); font-family:"IBM Plex Sans","IBM Plex Sans JP",Arial,sans-serif; }
+body { margin:0; background:#f4f4f4; color:var(--text); font-family:var(--font-ibm-plex-jp,"IBM Plex Sans JP"),"Hiragino Sans","Yu Gothic",Arial,sans-serif; }
 button,input { font:inherit; } button,a { -webkit-tap-highlight-color:transparent; } button { cursor:pointer; }
 .page-stage { display:flex; min-height:100dvh; justify-content:center; }
 .app-frame { --accent:var(--blue); display:flex; width:min(100%,390px); height:100dvh; min-height:0; flex-direction:column; overflow:hidden; background:#fff; }
@@ -49,7 +49,7 @@ button,input { font:inherit; } button,a { -webkit-tap-highlight-color:transparen
 .drop-zone { display:flex; height:80px; align-items:center; gap:20px; padding:8px; overflow:hidden; border:2px solid var(--accent); background:var(--composer-bg); transition:border-color 280ms ease-in-out; }
 .composer-copy { display:flex; min-width:0; height:100%; flex:1; flex-direction:column; align-items:flex-start; justify-content:space-between; }
 .composer-copy p { overflow:hidden; max-width:100%; margin:0; color:var(--text-secondary); font-size:12px; line-height:16px; text-overflow:ellipsis; white-space:nowrap; }
-.composer-selection { display:flex; width:100%; min-width:0; height:32px; gap:18px; overflow-x:auto; overflow-y:hidden; overscroll-behavior-inline:contain; scroll-behavior:smooth; scrollbar-width:none; touch-action:pan-x; white-space:nowrap; }
+.composer-selection { display:flex; width:100%; min-width:0; height:32px; gap:18px; overflow-x:auto; overflow-y:hidden; overscroll-behavior-x:contain; scroll-behavior:smooth; scrollbar-width:none; touch-action:pan-x; white-space:nowrap; }
 .composer-selection::-webkit-scrollbar { display:none; }
 .input-tag { display:flex; max-width:170px; height:32px; flex:0 0 auto; align-items:center; gap:6px; padding:0 8px; overflow:hidden; border:0; border-radius:16px; background:#f4f4f4; color:#161616; font-size:12px; line-height:16px; letter-spacing:.32px; white-space:nowrap; }
 .input-tag span { overflow:hidden; text-overflow:ellipsis; }
