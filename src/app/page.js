@@ -28,20 +28,10 @@ const savedPlans = [
   { month:"7月", day:"13", state:"完了", title:"横浜みなとみらい散歩", location:"神奈川県・日帰り", description:"水族館と海辺の短距離コース", tags:["電車移動","家族向け"] },
 ];
 const ongoingPlan = { month:"8月", day:"24", state:"お出かけ中", title:"高原の湖と森林散歩", location:"山梨県・日帰り", description:"木陰の散歩道と湖畔ランチ", tags:["ベビーカーOK","避暑地"], ongoing:true };
-const conversationTags = [
-  { kind:"tag", icon:"tree", label:"自然の多い場所", span:2 }, { kind:"tag", icon:"rain", label:"雨でも楽しめる", span:2 },
-  { kind:"tag", icon:"pedestrian", label:"子どもと歩きやすい", span:2 }, { kind:"tag", icon:"restaurant", label:"ランチも楽しみたい", span:2 },
-  { kind:"tag", icon:"cabin", label:"混雑を避けたい", span:2 }, { kind:"tag", icon:"purchase", label:"キャッシュレス対応", span:2 },
-];
-const conversationSpots = [
-  { kind:"card", image:"/travel-cards/forest-lake.png", title:"高原の湖と森林散歩", detail:"木陰が多く、夏でも涼しい自然スポット" },
-  { kind:"card", image:"/travel-cards/science-museum.png", title:"名古屋市科学館", detail:"屋内で親子が楽しめる体験型ミュージアム" },
-];
-const createConversationIdeas = () => {
-  const spot = conversationSpots[Math.floor(Math.random() * conversationSpots.length)];
-  const tagCount = Math.random() > .5 ? 2 : 1;
-  const tags = [...conversationTags].sort(() => Math.random() - .5).slice(0, tagCount);
-  return [spot, ...tags];
+const createConversationIdeas = (isInstant) => {
+  const source = isInstant ? [...instantItems, ...pinnedItems.filter((item) => item.label !== "追加")] : [...discoveryItems, ...lowerItems, ...pinnedItems.filter((item) => item.label !== "追加")];
+  const count = Math.random() > .5 ? 3 : 2;
+  return source.sort(() => Math.random() - .5).slice(0, count);
 };
 
 function Tag({ icon, label, span = 1, selected = false, onToggle }) {
@@ -100,7 +90,7 @@ export default function Home() {
       setIsSubmitting(true);
       window.setTimeout(() => {
         setChatRounds((rounds) => rounds.map((round) => round.id === roundId ? { ...round, thinking:false } : round));
-        setConversationIdeas(createConversationIdeas());
+        setConversationIdeas(createConversationIdeas(instantMode));
         setIsSubmitting(false);
       }, 1400);
       return;
@@ -112,9 +102,9 @@ export default function Home() {
   const proposalText = `${submittedTags.map((item) => item.label).join("、")}を基に旅先を提案します。`;
   useEffect(() => {
     if (!chatMode || chatRounds.length || conversationIdeas.length) return;
-    const timer = window.setTimeout(() => setConversationIdeas(createConversationIdeas()), 1800);
+    const timer = window.setTimeout(() => setConversationIdeas(createConversationIdeas(instantMode)), 1800);
     return () => window.clearTimeout(timer);
-  }, [chatMode, chatRounds.length, conversationIdeas.length]);
+  }, [chatMode, chatRounds.length, conversationIdeas.length, instantMode]);
   useEffect(() => {
     if (!conversationIdeas.length) return;
     const frame = window.requestAnimationFrame(() => conversationRef.current?.scrollTo({ top:conversationRef.current.scrollHeight, behavior:"smooth" }));
@@ -157,7 +147,7 @@ export default function Home() {
           <article className="message message-user"><strong>あなた</strong><div className="message-tags">{submittedTags.map((item) => <InputTag {...item} disabled key={item.label} />)}</div></article>
           <article className="message message-ai"><strong>IB Navigator</strong><p>もちろんです。{proposalText}</p><small>AIが提案を作成中です</small></article>
           {chatRounds.map((round) => <div className="chat-round" key={round.id}><article className="message message-user"><strong>あなた</strong><div className="message-tags">{round.tags.map((item) => <InputTag {...item} disabled key={item.label} />)}</div></article><article className="message message-ai"><strong>IB Navigator</strong><p>{round.tags.map((item) => item.label).join("、")}を基に、次の候補を考えます。</p><small>{round.thinking ? "AIが提案を作成中です" : "候補を更新しました"}</small></article></div>)}
-          {!!conversationIdeas.length && <div className="idea-block"><article className="message message-ai idea-prompt"><strong>IB Navigator</strong><p>こちらのアイデアはどうですか</p></article><div className="chat-ideas">{conversationIdeas.map((idea) => idea.kind === "card" ? <DestinationCard image={idea.image} title={idea.title} detail={idea.detail} selected={isSelected(idea.title)} onToggle={toggleTag} key={idea.title} /> : <Tag {...idea} selected={isSelected(idea.label)} onToggle={toggleTag} key={idea.label} />)}</div></div>}
+          {!!conversationIdeas.length && <div className="idea-block"><article className="message message-ai idea-prompt"><strong>IB Navigator</strong><p>こちらのアイデアはどうですか</p></article><div className="chat-ideas">{conversationIdeas.map((idea) => <Tag {...idea} selected={isSelected(idea.label)} onToggle={toggleTag} key={idea.label} />)}</div></div>}
           <p className="ai-disclaimer">AIの提案には誤りが含まれる場合があります。予約前に最新情報をご確認ください。</p>
         </section> : <div className={`planning-content ${isSubmitting ? "is-leaving" : ""}`}>
         <section className="greeting"><h1>こんばんは、佐藤さん</h1>{instantMode ? <p>直ぐにアドレスを提案できます</p> : <p>どんなお出かけを一緒に計画しましょうか？<br />希望を伝えるだけで候補を整理します。</p>}</section>
@@ -181,7 +171,7 @@ export default function Home() {
         </div>
         </div>}
 
-        <section className="composer"><div className="drop-zone"><div className="composer-copy">{selectedTags.length ? <div className="composer-selection" data-no-page-swipe aria-label="選択したタグ" tabIndex={0} onWheel={(event) => { if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) event.currentTarget.scrollLeft += event.deltaY; }}>{selectedTags.map((item) => <InputTag {...item} disabled={isSubmitting} onRemove={() => toggleTag(item)} key={item.label} />)}</div> : <p>タグやスポットを追加または長押で音声認識</p>}<label className="instant-mode"><input type="checkbox" checked={instantMode} disabled={chatMode || isSubmitting} onChange={(event) => changeMode(event.target.checked)} /><span className="toggle" aria-hidden="true"><span /></span><span>即時検索モード</span></label></div><button className="send-button" type="button" disabled={!selectedTags.length || isSubmitting} onClick={submitRequest} aria-label="旅行条件を送信"><Icon name="arrow-right" size={16} /></button></div></section>
+        <section className="composer"><div className="drop-zone"><div className="composer-copy">{selectedTags.length ? <div className="composer-selection" data-no-page-swipe aria-label="選択したタグ" tabIndex={0} onWheel={(event) => { if (Math.abs(event.deltaY) > Math.abs(event.deltaX)) event.currentTarget.scrollLeft += event.deltaY; }}>{selectedTags.map((item) => <InputTag {...item} disabled={isSubmitting} onRemove={() => toggleTag(item)} key={item.label} />)}</div> : <p>タグやスポットを追加または長押で音声認識</p>}{!chatMode && <label className="instant-mode"><input type="checkbox" checked={instantMode} disabled={isSubmitting} onChange={(event) => changeMode(event.target.checked)} /><span className="toggle" aria-hidden="true"><span /></span><span>即時検索モード</span></label>}</div><button className="send-button" type="button" disabled={!selectedTags.length || isSubmitting} onClick={submitRequest} aria-label="旅行条件を送信"><Icon name="arrow-right" size={16} /></button></div></section>
         </div>
         <div className="page-panel plans-panel" aria-hidden={activeView !== "plans"}><PlansView /></div>
         </div></div>
