@@ -27,6 +27,7 @@ const savedPlans = [
   { month:"9月", day:"07", state:"計画中", title:"名古屋 親子ミュージアム", location:"愛知県・1泊2日", description:"科学館を中心にした雨の日プラン", tags:["屋内","授乳室"] },
   { month:"7月", day:"13", state:"完了", title:"横浜みなとみらい散歩", location:"神奈川県・日帰り", description:"水族館と海辺の短距離コース", tags:["電車移動","家族向け"] },
 ];
+const ongoingPlan = { month:"8月", day:"24", state:"お出かけ中", title:"高原の湖と森林散歩", location:"山梨県・日帰り", description:"木陰の散歩道と湖畔ランチ", tags:["ベビーカーOK","避暑地"], ongoing:true };
 
 function Tag({ icon, label, span = 1, selected = false, onToggle }) {
   return <button className={`tag span-${span} ${selected ? "is-selected" : ""}`} type="button" onClick={() => onToggle?.({ icon, label })} aria-pressed={selected}><Icon name={icon} /><span>{label}</span></button>;
@@ -40,16 +41,18 @@ function DestinationCard({ image, title, detail }) {
   return <article className="destination-card"><div className="destination-image"><Image src={image} alt="" fill sizes="170px" /></div><div className="destination-copy"><strong>{title}</strong><span>{detail}</span></div><span className="drag-handle" aria-hidden="true">⋮⋮</span></article>;
 }
 
-function SavedPlanCard({ plan }) {
-  return <article className={`saved-plan-card ${plan.upcoming ? "upcoming" : ""}`}>
+function SavedPlanCard({ plan, onSelect, selected = false }) {
+  const Wrapper = onSelect ? "button" : "article";
+  return <Wrapper className={`saved-plan-card ${plan.upcoming ? "upcoming" : ""} ${plan.ongoing ? "ongoing" : ""} ${onSelect ? "selectable-plan" : ""} ${selected ? "is-selected" : ""}`} {...(onSelect ? { type:"button", onClick:onSelect, "aria-pressed":selected } : {})}>
     <div className="plan-date"><span>{plan.month}</span><strong>{plan.day}</strong><span>日</span></div>
-    <div className="saved-plan-copy"><div className="plan-status-row"><span className="plan-status">{plan.state}</span><button type="button" aria-label={`${plan.title}のメニュー`}><Icon name="more" /></button></div><h2>{plan.title}</h2><p className="plan-location"><Icon name="location" />{plan.location}</p><p className="plan-description">{plan.description}</p><div className="plan-tags">{plan.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
-  </article>;
+    <div className="saved-plan-copy"><div className="plan-status-row"><span className="plan-status">{plan.state}</span>{onSelect ? <span className="plan-more" aria-hidden="true"><Icon name="more" /></span> : <button type="button" aria-label={`${plan.title}のメニュー`}><Icon name="more" /></button>}</div><h2>{plan.title}</h2><p className="plan-location"><Icon name="location" />{plan.location}</p><p className="plan-description">{plan.description}</p><div className="plan-tags">{plan.tags.map((tag) => <span key={tag}>{tag}</span>)}</div></div>
+  </Wrapper>;
 }
 
 function PlansView() {
   return <section className="plans-view" aria-label="保存したプラン">
     <div className="plans-controls"><div className="plans-title-row"><h1>保存したプラン</h1><span>3件</span></div><label className="plans-search"><Icon name="plans-search" /><input type="search" placeholder="プラン名・行き先で検索" aria-label="プラン名・行き先で検索" /></label><div className="plans-filters"><button className="active" type="button">すべて</button><button type="button">近日</button><button type="button">過去</button><button className="sort" type="button">更新順<Icon name="chevron-down" /></button></div></div>
+    <SavedPlanCard plan={ongoingPlan} />
     <div className="plans-list">{savedPlans.map((plan) => <SavedPlanCard plan={plan} key={plan.title} />)}</div>
   </section>;
 }
@@ -123,7 +126,7 @@ export default function Home() {
 
         <div className={`discover-scroll ${showAdvice ? "is-visible" : ""}`} id="discover-content" aria-hidden={!showAdvice}>
           <div className="discover-grid">
-            {instantMode ? instantItems.map((item) => <Tag {...item} selected={isSelected(item.label)} onToggle={toggleTag} key={item.label} />) : <>
+            {instantMode ? <>{instantItems.map((item) => <Tag {...item} selected={isSelected(item.label)} onToggle={toggleTag} key={item.label} />)}<SavedPlanCard plan={ongoingPlan} selected={isSelected(`${ongoingPlan.title}のプラン`)} onSelect={() => toggleTag({ icon:"plan", label:`${ongoingPlan.title}のプラン` })} /></> : <>
               {discoveryItems.map((item) => <Tag {...item} selected={isSelected(item.label)} onToggle={toggleTag} key={item.label} />)}
               <DestinationCard image="/travel-cards/forest-lake.png" title="高原の湖と森林散歩" detail="木陰が多く、夏でも涼しい自然スポット" />
               <DestinationCard image="/travel-cards/science-museum.png" title="名古屋市科学館" detail="屋内で親子が楽しめる体験型ミュージアム" />

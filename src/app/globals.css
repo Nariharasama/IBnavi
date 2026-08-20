@@ -73,14 +73,20 @@ button,input { font:inherit; } button,a { -webkit-tap-highlight-color:transparen
 .plans-list { display:flex; min-height:0; flex:1 1 0; flex-direction:column; gap:10px; margin:0 -16px; padding:10px 16px; overflow-y:auto; background:#f4f4f4; scrollbar-width:thin; }
 .saved-plan-card { display:flex; min-height:154px; flex:0 0 154px; overflow:hidden; border:1px solid #c6c6c6; background:#fff; }
 .saved-plan-card.upcoming { min-height:158px; flex-basis:158px; border:2px solid var(--blue); }
+.saved-plan-card.ongoing { min-height:158px; flex-basis:158px; border-color:#d02670; }
+.selectable-plan { grid-column:1/-1; width:100%; padding:0; text-align:left; }
+.selectable-plan.is-selected { outline:2px solid #d02670; outline-offset:-2px; }
 .plan-date { display:flex; width:64px; flex:0 0 64px; flex-direction:column; align-items:center; justify-content:center; background:#161616; color:#fff; }
 .upcoming .plan-date { background:var(--blue); }
+.ongoing .plan-date { background:#d02670; }
 .plan-date span { font-size:12px; line-height:16px; }.plan-date strong { font-size:28px; font-weight:400; line-height:34px; }
 .saved-plan-copy { display:flex; min-width:0; flex:1; flex-direction:column; padding:10px 12px; }
 .plan-status-row { display:flex; height:20px; align-items:center; justify-content:space-between; }
 .plan-status { padding:2px 8px; border-radius:10px; background:#e0e0e0; color:#525252; font-size:11px; line-height:16px; }
 .upcoming .plan-status { background:#d0e2ff; color:#0043ce; }
+.ongoing .plan-status { background:#edf5ff; color:#d02670; }
 .plan-status-row button { display:grid; width:24px; height:24px; padding:4px; place-items:center; border:0; background:transparent; }
+.plan-more { display:grid; width:24px; height:24px; padding:4px; place-items:center; }
 .saved-plan-copy h2 { overflow:hidden; margin:4px 0 1px; font-size:16px; font-weight:600; line-height:20px; text-overflow:ellipsis; white-space:nowrap; }
 .saved-plan-copy p { margin:0; color:#525252; font-size:12px; line-height:16px; }
 .plan-location { display:flex; align-items:center; gap:4px; }.plan-description { overflow:hidden; margin-top:4px!important; text-overflow:ellipsis; white-space:nowrap; }
